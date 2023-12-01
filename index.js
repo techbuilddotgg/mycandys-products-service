@@ -380,6 +380,17 @@ app.get('/products/sorted/:criteria', async (req, res) => {
     }
 });
 
+//todo get products with ids for cart
+app.get('/products/cart/:ids', async (req, res) => {
+    try {
+        const ids = req.params.ids.split(',');
+        const products = await Product.find({ _id: { $in: ids } });
+        res.status(200).json(products);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
