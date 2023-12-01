@@ -21,7 +21,7 @@ jobs:
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
     - name: Docker build
-      run: docker build . --file Dockerfile --tag ${{DOCKER_REPO}}/${{DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
+      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
       
     - name: DockerHub push
       run: docker push ${{DOCKER_REPO}}/${{DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
