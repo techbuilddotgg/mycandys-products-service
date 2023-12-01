@@ -32,7 +32,7 @@ jobs:
       with:
         images: ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}
         
-    - run: 'echo "$SSH_KEY" > key'
-      shell: bash
-      env:
-        SSH_KEY: ${{steps.meta.outputs.tags}}
+    - name: GitHub Tag Name example
+      run: |
+        echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF_NAME"
+        echo "Tag name from github.ref_name: ${{  github.ref_name }}"
