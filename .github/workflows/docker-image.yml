@@ -24,7 +24,7 @@ jobs:
       run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
       
     - name: DockerHub push
-      run: docker push ${{DOCKER_REPO}}/${{DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
+      run: docker push ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
       
     - name: Update Minor version
       uses: hmanzur/actions-set-secret@v2.0.0
