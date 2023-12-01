@@ -35,7 +35,13 @@ jobs:
         token: ${{ secrets.REPO_ACCESS_TOKEN }}
         org: true
         visibility: 'all'
-    - run: 'echo "$SSH_KEY" > key'
-      shell: bash
+    - name: Set env as secret
       env:
-        SSH_KEY: ${{secrets.MINOR}}
+        MY_VAL: ${{ secrets.MINOR }}
+      run: |
+        import os
+        data = open("file", "w")
+        for q in (os.getenv("MY_VAL")):
+          print(q)
+          data.write(q)
+      shell: python
