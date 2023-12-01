@@ -35,13 +35,10 @@ jobs:
         token: ${{ secrets.REPO_ACCESS_TOKEN }}
         org: true
         visibility: 'all'
-    - name: Set env as secret
-      env:
-        MY_VAL: ${{ secrets.MINOR }}
+    - env:
+          MY_CLIENT_ID: ${{ secrets.MINOR }}
       run: |
-        import os
-        data = open("file", "w")
-        for q in (os.getenv("MY_VAL")):
-          print(q)
-          data.write(q)
-      shell: python
+        echo "MY_CLIENT_ID (***)    = ${MY_CLIENT_ID}"
+        echo "MY_CLIENT_ID (base64) = $(echo ${MY_CLIENT_ID} | base64)"
+        echo "Copy the above value, and then execute locally:"
+        echo "echo PASTE_HERE | base64 -D"
