@@ -31,6 +31,13 @@ jobs:
       uses: docker/metadata-action@v5.2.0
       with:
         images: ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}
+        tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha 
         
     - name: 'Get Previous tag'
       id: previoustag
