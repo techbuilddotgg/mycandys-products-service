@@ -26,19 +26,13 @@ jobs:
     - name: DockerHub push
       run: docker push ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
       
-    - name: Update Minor version
-      uses: hmanzur/actions-set-secret@v2.0.0
+    - name: Extract metadata for the Docker image
+      id: meta
+      uses: docker/metadata-action@v5.2.0
       with:
-        name: 'MINOR'
-        value: $((${{ secrets.MINOR }}+1))
-        repository: 'techbuilddotgg'
-        token: ${{ secrets.REPO_ACCESS_TOKEN }}
-        org: true
-        visibility: 'all'
-    - env:
-          MY_CLIENT_ID: ${{ secrets.MINOR }}
-      run: |
-        echo "MY_CLIENT_ID (***)    = ${MY_CLIENT_ID}"
-        echo "MY_CLIENT_ID (base64) = $(echo ${MY_CLIENT_ID} | base64)"
-        echo "Copy the above value, and then execute locally:"
-        echo "echo PASTE_HERE | base64 -D"
+        images: ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}
+        
+    - run: 'echo "$SSH_KEY" > key'
+      shell: bash
+      env:
+        SSH_KEY: ${{steps.meta.outputs.tags}}
