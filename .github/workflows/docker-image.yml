@@ -34,7 +34,10 @@ jobs:
       with:
         images: ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}
         
-    - name: GitHub Tag Name example
-      run: |
-        echo "Tag name from GITHUB_REF_NAME: $GITHUB_REF#refs/tags/"
-        echo "Tag name from github.ref_name: ${{  GITHUB_REF#refs/tags/ }}"
+    - name: 'Get Previous tag'
+      id: previoustag
+      uses: "WyriHaximus/github-action-get-previous-tag@v1"
+      with:
+        fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
+    - name: 'Get Previous tag'
+    	run: echo ${{ steps.previoustag.outputs.tag }}
