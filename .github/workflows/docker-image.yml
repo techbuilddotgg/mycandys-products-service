@@ -2,6 +2,7 @@ name: Docker Image CI/CD
 
 on:
   push:
+    branches: [ "main" ]
     tags: 
       - '*'
   workflow_dispatch:
@@ -26,30 +27,13 @@ jobs:
     - name: DockerHub push
       run: docker push ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
       
-    - name: Extract metadata for the Docker image
-      id: meta
-      uses: docker/metadata-action@v5.2.0
-      with:
-        images: ${{ env.DOCKER_REPO }}/${{ env.DOCKER_IMAGE }}
-        tags: |
-            type=ref,event=branch
-            type=ref,event=pr
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=sha 
+    - name: Get Git Tag
+      id: get_tag
+      run: |
+        echo "Setting tag..."
+        TAG=$(git describe --abbrev=0)
+        echo "TAG=$TAG" >> $GITHUB_ENV
         
-    - name: 'Get Previous tag'
-      id: previoustag
-      uses: "WyriHaximus/github-action-get-previous-tag@v1"
-      with:
-        fallback: 1.0.0 # Optional fallback tag to use when no tag can be found
-    - name: 'Get Previous tag'
-      run: echo ${{ steps.previoustag.outputs.tag }}
-    - name: Build and push Docker images
-      uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
-      with:
-        context: .
-        push: true
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+    - name: Use Git Tag in Workflow
+      run: |
+        echo "The tag is $TAG"
