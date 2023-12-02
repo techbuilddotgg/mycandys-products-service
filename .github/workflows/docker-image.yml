@@ -7,31 +7,35 @@ on:
     branches: [ "main" ]
 
 jobs:
-
   build:
-
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
-    - name: Docker login
+    - uses: actions/checkout@v4
+      with:
+        ref: main
+        fetch-depth: 0
+    - name: Get Latest Tag
+      id: get_tag
+      run: |
+        TAG=$(git describe --abbrev=0)
+        echo "TAG=$TAG" >> $GITHUB_ENV
+      continue-on-error: true
+
+    - name: Set Default Tag If Missing
+      if: steps.get_tag.outcome != 'success'
+      run: |
+        echo "TAG=v1.0.0" >> $GITHUB_ENV
+        
+    - name: Docker Login
       env:
         DOCKER_USER: ${{secrets.DOCKER_USER}}
         DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
         docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - name: Docker build
-      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
+        
+    - name: Docker Build
+      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:$TAG
       
-    - name: DockerHub push
-      run: docker push ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
-      
-    - name: Update Minor version
-      uses: hmanzur/actions-set-secret@v2.0.0
-      with:
-        name: 'MINOR'
-        value: $((${{ secrets.MINOR }}+1))
-        repository: 'techbuilddotgg'
-        token: ${{ secrets.REPO_ACCESS_TOKEN }}
-        org: true
-        visibility: 'all'
+    - name: DockerHub Push
+      run: docker push ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:$TAG
