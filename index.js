@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
+const Product = require('./productModel');
 
 dotenv.config();
 
@@ -11,16 +12,6 @@ const port = process.env.PORT || 3000;
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI, {dbName: 'db_products'});
-
-const productSchema = new mongoose.Schema({
-    name: String,
-    price: Number,
-    description: String,
-    category: String,
-    imgUrl: String,
-});
-
-const Product = mongoose.model('Product', productSchema);
 
 app.use(express.json());
 
@@ -55,7 +46,9 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *       properties:
  *         name:
  *           type: string
- *         price:
+ *         originalPrice:
+ *           type: number
+ *         temporaryPrice:
  *           type: number
  *         description:
  *           type: string
@@ -202,7 +195,6 @@ app.get('/products/categories', async (req, res) => {
         const categories = await Product.distinct('category');
         res.status(200).json(categories);
     } catch (error) {
-        console.log(error)
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
@@ -347,7 +339,7 @@ app.get('/products/category/:category', async (req, res) => {
  *       - in: path
  *         name: criteria
  *         required: true
- *         description: Sorting criteria (e.g., price)
+ *         description: Sorting criteria (e.g., originalprice, name, temporaryprice)
  *         schema:
  *           type: string
  *     responses:
@@ -367,8 +359,7 @@ app.get('/products/category/:category', async (req, res) => {
 app.get('/products/sorted/:criteria', async (req, res) => {
     try {
         const criteria = req.params.criteria.toLowerCase();
-        const validCriteria = ['price']; // Add more valid criteria as needed
-
+        const validCriteria = ['originalprice', 'name', 'temporaryprice']; // Add more valid criteria as needed
         if (!validCriteria.includes(criteria)) {
             return res.status(400).json({ error: 'Invalid sorting criteria' });
         }
@@ -376,6 +367,73 @@ app.get('/products/sorted/:criteria', async (req, res) => {
         const products = await Product.find().sort({ [criteria]: 1 });
         res.status(200).json(products);
     } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+// Add discount to product
+/**
+ * @swagger
+ * /products/{productId}/discount:
+ *   put:
+ *     summary: Update the temporary price of a product
+ *     tags:
+ *       - Products
+ *     parameters:
+ *       - in: path
+ *         name: productId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: The ID of the product
+ *     requestBody:
+ *       description: The new temporary price
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - temporaryPrice
+ *             properties:
+ *               temporaryPrice:
+ *                 type: number
+ *     responses:
+ *       '200':
+ *         description: Successful operation. Returns the updated product.
+ *       '400':
+ *         description: Invalid data.
+ *       '404':
+ *         description: Product not found.
+ *       '500':
+ *         description: Internal Server Error.
+ */
+app.put('/products/:productId/discount', async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        const { temporaryPrice } = req.body;
+
+        // Validate input
+        if (!productId || !temporaryPrice) {
+            return res.status(400).json({ error: 'Invalid data' });
+        }
+
+        // Find the product by ID
+        const product = await Product.findById(productId);
+
+        if (!product) {
+            return res.status(404).json({ error: 'Product not found' });
+        }
+
+        // Update the temporaryPrice
+        product.temporaryPrice = temporaryPrice;
+
+        // Save the updated product
+        await product.save();
+
+        res.status(200).json(product);
+    } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
