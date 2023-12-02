@@ -21,8 +21,6 @@ jobs:
     - name: Get Git Tag
       id: get_tag
       run: |
-        echo "Setting tag..."
-        git tag
         TAG=$(git describe --abbrev=0)
         echo "TAG=$TAG" >> $GITHUB_ENV
       continue-on-error: true
