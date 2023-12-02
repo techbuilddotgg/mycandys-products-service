@@ -16,7 +16,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        ref: my-branch
+        ref: main
     - name: Get Git Tag
       id: get_tag
       run: |
