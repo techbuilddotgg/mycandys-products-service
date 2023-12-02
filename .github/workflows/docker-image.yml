@@ -25,7 +25,7 @@ jobs:
         git tag
         TAG=$(git describe --abbrev=0)
         echo "TAG=$TAG" >> $GITHUB_ENV
-        exit 0
+      continue-on-error: true
 
     - name: Catch Step
       if: ${{ failure() }}  # Izvedi le, če je predhodni korak končal z napako
@@ -33,6 +33,5 @@ jobs:
         echo "TAG=v1.0.0" >> $GITHUB_ENV
         
     - name: Use Git Tag in Workflow
-      if: ${{ always() }}
       run: |
         echo "The tag is $TAG"
