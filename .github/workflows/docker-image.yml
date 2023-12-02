@@ -15,22 +15,11 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    - name: Docker login
-      env:
-        DOCKER_USER: ${{secrets.DOCKER_USER}}
-        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
-      run: |
-        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
-    - name: Docker build
-      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
-      
-    - name: DockerHub push
-      run: docker push ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:${{ secrets.MAJOR }}.${{ secrets.MINOR }}
-      
     - name: Get Git Tag
       id: get_tag
       run: |
         echo "Setting tag..."
+        git tag
         TAG=$(git describe --abbrev=0)
         echo "TAG=$TAG" >> $GITHUB_ENV
         
