@@ -28,7 +28,7 @@ jobs:
       continue-on-error: true
 
     - name: Catch Step
-      if: ${{ failure() }}  # Izvedi le, če je predhodni korak končal z napako
+      if: steps.get_tag.outcome != 'success'  # Izvedi le, če je predhodni korak končal z napako
       run: |
         echo "TAG=v1.0.0" >> $GITHUB_ENV
         
