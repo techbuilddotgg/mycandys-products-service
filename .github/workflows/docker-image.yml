@@ -18,18 +18,27 @@ jobs:
       with:
         ref: main
         fetch-depth: 0
-    - name: Get Git Tag
+    - name: Get Latest Tag
       id: get_tag
       run: |
         TAG=$(git describe --abbrev=0)
         echo "TAG=$TAG" >> $GITHUB_ENV
       continue-on-error: true
 
-    - name: Catch Step
+    - name: Set Default Tag If Missing
       if: steps.get_tag.outcome != 'success'  # Izvedi le, če je predhodni korak končal z napako
       run: |
         echo "TAG=v1.0.0" >> $GITHUB_ENV
         
-    - name: Use Git Tag in Workflow
+    - name: Docker Login
+      env:
+        DOCKER_USER: ${{secrets.DOCKER_USER}}
+        DOCKER_PASSWORD: ${{secrets.DOCKER_PASSWORD}}
       run: |
-        echo "The tag is $TAG"
+        docker login -u $DOCKER_USER -p $DOCKER_PASSWORD
+        
+    - name: Docker Build
+      run: docker build . --file Dockerfile --tag ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:$TAG
+      
+    - name: DockerHub Push
+      run: docker push ${{secrets.DOCKER_REPO}}/${{secrets.DOCKER_IMAGE}}:$TAG
