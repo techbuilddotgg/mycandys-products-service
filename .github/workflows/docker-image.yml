@@ -33,5 +33,6 @@ jobs:
         echo "TAG=v1.0.0" >> $GITHUB_ENV
         
     - name: Use Git Tag in Workflow
+      if: ${{ always() }}
       run: |
         echo "The tag is $TAG"
