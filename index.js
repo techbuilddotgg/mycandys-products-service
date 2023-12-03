@@ -50,6 +50,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *           type: number
  *         temporaryPrice:
  *           type: number
+ *           default: -1
  *         description:
  *           type: string
  *         category:
@@ -387,7 +388,7 @@ app.get('/products/sorted/:criteria', async (req, res) => {
  *           type: string
  *         description: The ID of the product
  *     requestBody:
- *       description: The new temporary price
+ *       description: The new temporary price, if no discount set to -1
  *       required: true
  *       content:
  *         application/json:
