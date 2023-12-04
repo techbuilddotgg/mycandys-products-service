@@ -5,7 +5,7 @@ const swaggerJsdoc = require('swagger-jsdoc');
 const swaggerUi = require('swagger-ui-express');
 const Product = require('./productModel');
 const cors = require('cors');
-
+const axios = require("axios");
 
 dotenv.config();
 
@@ -454,6 +454,17 @@ app.get('/products/cart/:ids', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
+
+// Middleware to verify token
+const verifyToken = async (req, res, next) => {
+    try {
+        const response = await axios.get(`http://localhost:3000/auth/verify`, { headers: {
+                'Authorization': bearerToken
+            }});
+        req.userId = response.data.userId
+    } catch (error) {
+        return res.status(401).json({ error: 'Unauthorized' });
+}};
 
 // Start the server
 app.listen(port, () => {
