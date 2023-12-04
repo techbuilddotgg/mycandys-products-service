@@ -47,6 +47,7 @@ const verifyToken = async (req, res, next) => {
     const response = await axios.get(`${process.env.AUTH_SERVICE_URL}/auth/verify`, {
       headers: {
         Authorization: req.headers.authorization,
+        Host: req.headers.host,
       },
     });
     req.userId = response.data.userId;
