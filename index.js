@@ -41,6 +41,19 @@ const swaggerOptions = {
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
+// Middleware to verify token
+const verifyToken = async (req, res, next) => {
+    try {
+        const response = await axios.get(`${process.env.AUTH_SERVICE_URL}/auth/verify`, { headers: {
+                'Authorization': req.headers.Authorization
+            }});
+        req.userId = response.data.userId
+    } catch (error) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+    next();
+};
+
 // Create a new product
 /**
  * @swagger
@@ -91,7 +104,7 @@ app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
  *       500:
  *         description: Internal Server Error
  */
-app.post('/products', async (req, res) => {
+app.post('/products', verifyToken, async (req, res) => {
     try {
         const product = new Product(req.body);
         await product.save();
@@ -246,7 +259,7 @@ app.get('/products/:id', async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.put('/products/:id', async (req, res) => {
+app.put('/products/:id', verifyToken, async (req, res) => {
     try {
         const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
             new: true,
@@ -284,7 +297,7 @@ app.put('/products/:id', async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.delete('/products/:id', async (req, res) => {
+app.delete('/products/:id', verifyToken, async (req, res) => {
     try {
         const product = await Product.findByIdAndDelete(req.params.id);
         if (!product) {
@@ -414,7 +427,7 @@ app.get('/products/sorted/:criteria', async (req, res) => {
  *       '500':
  *         description: Internal Server Error.
  */
-app.put('/products/:productId/discount', async (req, res) => {
+app.put('/products/:productId/discount', verifyToken, async (req, res) => {
     try {
         const productId = req.params.productId;
         const { temporaryPrice } = req.body;
@@ -454,17 +467,6 @@ app.get('/products/cart/:ids', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
-// Middleware to verify token
-const verifyToken = async (req, res, next) => {
-    try {
-        const response = await axios.get(`http://localhost:3000/auth/verify`, { headers: {
-                'Authorization': bearerToken
-            }});
-        req.userId = response.data.userId
-    } catch (error) {
-        return res.status(401).json({ error: 'Unauthorized' });
-}};
 
 // Start the server
 app.listen(port, () => {
