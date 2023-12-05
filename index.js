@@ -57,6 +57,28 @@ const verifyToken = async (req, res, next) => {
   next();
 };
 
+/**
+ * @swagger
+ * /health:
+ *   get:
+ *     summary: Check if the service is running.
+ *     tags:
+ *       - Products
+ *     responses:
+ *       200:
+ *         description: Service is running.
+ *       500:
+ *         description: Service is not running.
+ */
+app.get('/health', (req, res) => {
+  try {
+    // You can add more sophisticated health-check logic here if needed
+    res.status(200).json({ status: 'Service is running' });
+  } catch (error) {
+    res.status(500).json({ error: 'Service is not running' });
+  }
+});
+
 // Create a new product
 /**
  * @swagger
