@@ -222,6 +222,26 @@ app.get('/products/categories', async (req, res) => {
 });
 
 // Get a single product by ID
+/**
+ * @swagger
+ * /products/{id}:
+ *   get:
+ *     summary: Get a product by ID
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: ID of the product
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Successful response with the product
+ *       404:
+ *         description: Product not found
+ *       500:
+ *         description: Internal Server Error
+ */
 app.get('/products/:id', async (req, res) => {
   try {
     const product = await Product.findById(req.params.id);
