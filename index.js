@@ -29,6 +29,9 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'API documentation for managing products.',
     },
+    externalDocs: {
+      url: "/swagger.json"
+    },
     servers: [
       {
         url: `http://localhost:${process.env.SWAGGER_PORT}`,
@@ -40,6 +43,10 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 app.use('/swagger', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.get('/swagger.json', (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.send(swaggerSpec);
+});
 
 // Middleware to verify token
 const verifyToken = async (req, res, next) => {
