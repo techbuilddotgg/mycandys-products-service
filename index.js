@@ -16,7 +16,7 @@ const port = process.env.PORT || 3000;
 app.use(cors());
 
 // Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, { dbName: 'db_products' });
+// mongoose.connect(process.env.MONGODB_URI, { dbName: 'db_products' });
 
 app.use(express.json());
 
@@ -136,7 +136,7 @@ app.get('/health', (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.post('/products', verifyToken, async (req, res) => {
+app.post('/products',  async (req, res) => {
   try {
     const product = new Product(req.body);
     await product.save();
@@ -311,7 +311,7 @@ app.get('/products/:id', async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.put('/products/:id', verifyToken, async (req, res) => {
+app.put('/products/:id', async (req, res) => {
   try {
     const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
       new: true,
@@ -349,7 +349,7 @@ app.put('/products/:id', verifyToken, async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.delete('/products/:id', verifyToken, async (req, res) => {
+app.delete('/products/:id', async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
@@ -479,7 +479,7 @@ app.get('/products/sorted/:criteria', async (req, res) => {
  *       '500':
  *         description: Internal Server Error.
  */
-app.put('/products/:productId/discount', verifyToken, async (req, res) => {
+app.put('/products/:productId/discount', async (req, res) => {
   try {
     const productId = req.params.productId;
     const { temporaryPrice } = req.body;
@@ -520,7 +520,17 @@ app.get('/products/cart/:ids', async (req, res) => {
   }
 });
 
+//delete all products from testing
+app.delete('/products', async (req, res) => {
+    try {
+        await Product.deleteMany({});
+        res.status(204).end();
+    } catch (error) {
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
 // Start the server
-app.listen(port, () => {
+ module.exports = app.listen(port, () => {
   console.log(`Server is running on port ${port}`);
 });
