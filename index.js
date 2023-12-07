@@ -112,6 +112,9 @@ app.get('/health', (req, res) => {
  *             - sour
  *         imgUrl:
  *           type: string
+ *         discountId:
+ *          type: string
+ *          required: false
  */
 
 /**
@@ -464,11 +467,16 @@ app.get('/products/sorted/:criteria', async (req, res) => {
  *         application/json:
  *           schema:
  *             type: object
- *             required:
- *               - temporaryPrice
  *             properties:
  *               temporaryPrice:
  *                 type: number
+ *                 description: The new temporary price of the product. If no discount, set discountId to -1.
+ *               discountId:
+ *                 type: string
+ *                 description: The ID of the discount to be applied.
+ *             required:
+ *               - temporaryPrice
+ *             additionalProperties: false
  *     responses:
  *       '200':
  *         description: Successful operation. Returns the updated product.
@@ -482,7 +490,7 @@ app.get('/products/sorted/:criteria', async (req, res) => {
 app.put('/products/:productId/discount', verifyToken, async (req, res) => {
   try {
     const productId = req.params.productId;
-    const { temporaryPrice } = req.body;
+    const { temporaryPrice, discountId } = req.body;
 
     // Validate input
     if (!productId || !temporaryPrice) {
@@ -498,6 +506,7 @@ app.put('/products/:productId/discount', verifyToken, async (req, res) => {
 
     // Update the temporaryPrice
     product.temporaryPrice = temporaryPrice;
+    product.discountId = discountId;
 
     // Save the updated product
     await product.save();

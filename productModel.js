@@ -7,6 +7,10 @@ const productSchema = new mongoose.Schema({
     description: String,
     category: String,
     imgUrl: String,
+    discountId: {
+        type: String,
+        required: false,
+    },
 });
 
 const Product = mongoose.model('Product', productSchema);
