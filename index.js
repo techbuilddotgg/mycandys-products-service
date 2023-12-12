@@ -29,6 +29,16 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'API documentation for managing products.',
     },
+    components: {
+      securitySchemes: {
+        Authorization: {
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          value: "Bearer <JWT token here>"
+        }
+      }
+    },
     externalDocs: {
       url: "/swagger.json"
     },
@@ -518,17 +528,6 @@ app.put('/products/:productId/discount', verifyToken, async (req, res) => {
     res.status(200).json(product);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-});
-
-//todo get products with ids for cart
-app.get('/products/cart/:ids', async (req, res) => {
-  try {
-    const ids = req.params.ids.split(',');
-    const products = await Product.find({ _id: { $in: ids } });
-    res.status(200).json(products);
-  } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 });
