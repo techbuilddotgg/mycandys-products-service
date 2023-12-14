@@ -96,11 +96,11 @@ app.use((req, res, next) => {
 
     const logMessage = {
       timestamp: new Date().toISOString(),
-      type: statusCode >= 500 ? 'Error' : (statusCode >= 400 ? 'Warning' : 'Info'),
       correlationId,
-      url: req.url,
-      message: `<${req.method} ${req.url}>`,
-      service: '[Products API]'
+      url: req.protocol + '://' + req.get('host') + req.originalUrl,
+      message: `${req.method} - ${req.url}`,
+      service: 'products',
+      type: statusCode >= 500 ? 'Error' : (statusCode >= 400 ? 'Warning' : 'Info'),
     };
 
     const logMessageJson = JSON.stringify(logMessage);
