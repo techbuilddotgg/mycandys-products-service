@@ -400,7 +400,7 @@ app.put('/products/:id', verifyToken, async (req, res) => {
  *       500:
  *         description: Internal Server Error
  */
-app.delete('/products/:id', async (req, res) => {
+app.delete('/products/:id', verifyToken,async (req, res) => {
   try {
     const product = await Product.findByIdAndDelete(req.params.id);
     if (!product) {
